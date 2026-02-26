@@ -40,7 +40,7 @@ def get_access_token(
         )
     if not Hash.verify(user.password, request.password):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Sai mật khẩu!"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Sai mật khẩu!"
         )
 
     access_token = oauth2.create_access_token(data={"sub": user.username})
@@ -116,15 +116,9 @@ async def login_for_ldap_account(login_request: LoginRequest):
             password=login_request.password,
             auto_bind=True,
         ) as conn:
-            access_token = oauth2.create_access_token(data={"sub": login_request.email})
-            refresh_token = oauth2.create_refresh_token(
-                data={"sub": login_request.email}
+            return HTTPException(
+                status_code=status.HTTP_200_OK, detail="Đăng nhập thành công"
             )
-            return {
-                "access_token": access_token,
-                "refresh_token": refresh_token,
-                "username": login_request.email,
-            }
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
