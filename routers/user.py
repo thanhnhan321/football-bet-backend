@@ -14,7 +14,7 @@ router = APIRouter(prefix="/user", tags=["user"])
     "/create-user",
     dependencies=[Depends(ADMIN_ROLE)],
 )
-async def create_user(
+def create_user(
     request: UserBase,
     db: Session = Depends(get_db),
     current_user: UserBase = Depends(get_current_user),

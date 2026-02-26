@@ -1,7 +1,8 @@
 from sqlalchemy.orm.session import Session
+from sqlalchemy.exc import IntegrityError
 from database.hash import Hash
 from routers.schemas import UserBase, UserUpdateBase
-from database.models import DbUser, DbUserRole
+from database.models import DbUser, DbUserRole, DbRole
 from fastapi import HTTPException, status
 import datetime
 import re
@@ -36,6 +37,8 @@ def create_user(db: Session, request: UserBase):
             status_code=400, detail="Password không được chứa khoảng trắng"
         )
 
+    member_role = db.query(DbRole).filter(DbRole.role_name == "member").first()
+
     new_user = DbUser(
         email=request.email,
         name=request.name,
@@ -46,15 +49,35 @@ def create_user(db: Session, request: UserBase):
         status=1,
     )
 
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    new_user_role = DbUserRole(user_id=new_user.id, role_id=2)
-    db.add(new_user_role)
-    db.commit()
-    return HTTPException(
-        status_code=status.HTTP_200_OK, detail="Tạo người dùng thành công"
-    )
+    try:
+        if not member_role:
+            member_role = DbRole(role_name="member", description="Default member role")
+            db.add(member_role)
+            db.flush()
+
+        db.add(new_user)
+        db.flush()
+
+        new_user_role = DbUserRole(user_id=new_user.id, role_id=member_role.id)
+        db.add(new_user_role)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email hoặc username đã tồn tại",
+        )
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Không thể tạo người dùng",
+        )
+
+    return {"detail": "Tạo người dùng thành công"}
 
 
 def get_user_by_username(db: Session, username: str):
