@@ -1,6 +1,7 @@
-from pydantic import BaseModel
 from datetime import datetime
 from typing import List
+
+from pydantic import BaseModel
 
 
 class MiniGameBase(BaseModel):
@@ -49,9 +50,12 @@ class SeasonBase(BaseModel):
 
 class UserDisplay(BaseModel):
     id: int
-    username: str
-    password: str
     email: str
+    name: str
+    username: str
+    department: str
+    initiated_date: datetime
+    status: int
 
     class Config:
         from_attributes = True
