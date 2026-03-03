@@ -16,6 +16,12 @@ class DbUser(Base):
     status = Column(Integer)
 
 
+class DbDepartment(Base):
+    __tablename__ = "department"
+    id = Column(Integer, primary_key=True, index=True)
+    department_name = Column(String, unique=True, index=True)
+
+
 class DbSeason(Base):
     __tablename__ = "seasons"
     id = Column(Integer, primary_key=True, index=True)

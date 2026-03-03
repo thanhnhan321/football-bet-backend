@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from constant.role import ADMIN_ROLE
@@ -17,3 +19,12 @@ def create_role(
     db: Session = Depends(get_db),
 ):
     return db_role.create_role(db, request)
+
+
+@router.get(
+    "/role-list", response_model=List[RoleBase], dependencies=[Depends(ADMIN_ROLE)]
+)
+def get_all_roles(
+    db: Session = Depends(get_db),
+):
+    return db_role.get_all_roles(db)

@@ -47,10 +47,4 @@ def get_user_roles(
         .all()
     )
 
-    if not user_roles:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Người dùng không có vai trò nào",
-        )
-
     return [role[0] for role in user_roles]

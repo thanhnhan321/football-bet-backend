@@ -5,7 +5,7 @@ from auth import authentication
 from core.config import settings
 from database import models
 from database.database import engine
-from routers import role, user, user_role, season, match, mini_game, option, report
+from routers import department, match, mini_game, option, report, role, season, user, user_role
 
 app = FastAPI()
 
@@ -17,6 +17,7 @@ def on_startup() -> None:
 
 
 app.include_router(authentication.router)
+app.include_router(department.router)
 app.include_router(role.router)
 app.include_router(user.router)
 app.include_router(user_role.router)

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -37,8 +37,18 @@ class UserBase(BaseModel):
     email: str
     name: str
     username: str
-    password: str
     department: str
+
+
+class DepartmentBase(BaseModel):
+    department_name: str
+
+
+class DepartmentDisplay(DepartmentBase):
+    id: int
+
+    class Config:
+        from_attributes = True
 
 
 class SeasonBase(BaseModel):
@@ -63,7 +73,7 @@ class UserDisplay(BaseModel):
     username: str
     department: str
     initiated_date: datetime
-    status: int
+    roles: List[str] = []
 
     class Config:
         from_attributes = True
@@ -95,24 +105,23 @@ class RefreshToken(BaseModel):
     refresh_token: str
 
 
+class FirstLoginPasswordChangeRequest(BaseModel):
+    username: str
+    current_password: str
+    new_password: str
+
+
 class MatchOptionBase(BaseModel):
     option_content: List[str]
     match_id: int
-
-
-class LoginRequest(BaseModel):
-    email: str
-    password: str
 
 
 class UserUpdateBase(BaseModel):
     email: str
     name: str
     username: str
-    password: str
     department: str
-    initiated_date: datetime
-    status: int
+    password: Optional[str] = None
 
 
 class SeasonUpdateBase(BaseModel):

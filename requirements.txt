@@ -12,6 +12,5 @@ jinja2
 websockets
 bcrypt==3.2.2
 psycopg2
-ldap3
 openpyxl
 python-dotenv

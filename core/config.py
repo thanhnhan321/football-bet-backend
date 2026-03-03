@@ -45,9 +45,6 @@ class Settings:
             )
         )
         self.auto_create_tables = _as_bool(os.getenv("DB_AUTO_CREATE_TABLES"), True)
-        self.ldap_server_url = os.getenv("LDAP_SERVER_URL", "ldap://10.3.12.17")
-        self.ldap_server_port = _as_int(os.getenv("LDAP_SERVER_PORT"), 389)
-        self.ldap_email_domain = os.getenv("LDAP_EMAIL_DOMAIN", "mobifone.vn")
 
     @staticmethod
     def _parse_origins(raw: str) -> List[str]:

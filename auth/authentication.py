@@ -1,23 +1,16 @@
-import re
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
-from ldap3 import ALL, Connection, Server
 from sqlalchemy.orm import Session
 
 from auth import oauth2
-from core.config import settings
 from database import models
 from database.database import get_db
 from database.hash import Hash
-from routers.schemas import LoginRequest, RefreshToken
+from routers.schemas import FirstLoginPasswordChangeRequest, RefreshToken
 
 router = APIRouter(tags=["authentication"])
-
-ldap_server = Server(
-    settings.ldap_server_url,
-    port=settings.ldap_server_port,
-    get_info=ALL,
+FIRST_LOGIN_REQUIRED_DETAIL = (
+    "Tài khoản đang dùng mật khẩu mặc định. Vui lòng đổi mật khẩu trước khi đăng nhập."
 )
 
 
@@ -40,6 +33,11 @@ def get_access_token(
 
     if not user or not Hash.verify(user.password, request.password):
         raise invalid_credentials
+    if Hash.verify(user.password, user.username):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=FIRST_LOGIN_REQUIRED_DETAIL,
+        )
 
     access_token = oauth2.create_access_token(data={"sub": user.username})
     refresh_token = oauth2.create_refresh_token(data={"sub": user.username})
@@ -76,42 +74,56 @@ def get_new_token(request: RefreshToken):
     }
 
 
-@router.post("/login/ldap")
-async def login_for_ldap_account(login_request: LoginRequest):
-    if " " in login_request.email:
+@router.post("/first-login/change-password")
+def change_password_first_login(
+    request: FirstLoginPasswordChangeRequest,
+    db: Session = Depends(get_db),
+):
+    username = request.username.strip()
+    current_password = request.current_password.strip()
+    new_password = request.new_password.strip()
+
+    if not username:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email không được chứa khoảng trắng",
+            detail="Username không được để trống",
         )
-
-    email = login_request.email
-    if "@" not in email:
-        email = f"{email}@{settings.ldap_email_domain}"
-
-    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+    if not current_password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Định dạng email không hợp lệ",
+            detail="Mật khẩu hiện tại không được để trống",
         )
-
-    expected_suffix = f"@{settings.ldap_email_domain}"
-    if not email.endswith(expected_suffix):
+    if not new_password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Vui lòng đăng nhập bằng tài khoản {settings.ldap_email_domain}",
+            detail="Mật khẩu mới không được để trống",
+        )
+    if " " in new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Mật khẩu mới không được chứa khoảng trắng",
+        )
+    if new_password == username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Mật khẩu mới không được trùng username",
         )
 
-    try:
-        with Connection(
-            ldap_server,
-            user=email,
-            password=login_request.password,
-            auto_bind=True,
-        ):
-            return {"detail": "Đăng nhập LDAP thành công"}
-    except Exception as exc:
+    user = db.query(models.DbUser).filter(models.DbUser.username == username).first()
+    if not user or not Hash.verify(user.password, current_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Thông tin đăng nhập không hợp lệ",
             headers={"WWW-Authenticate": "Bearer"},
-        ) from exc
+        )
+
+    if not Hash.verify(user.password, user.username):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Tài khoản đã đổi mật khẩu, vui lòng đăng nhập",
+        )
+
+    user.password = Hash.bcrypt(new_password)
+    db.commit()
+
+    return {"detail": "Đổi mật khẩu lần đầu thành công"}

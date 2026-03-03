@@ -43,3 +43,14 @@ def update_user(
     db: Session = Depends(get_db),
 ):
     return db_user.update_user(db, id, request)
+
+
+@router.put(
+    "/delete-user/{id}",
+    dependencies=[Depends(ADMIN_ROLE)],
+)
+def delete_user(
+    id: int,
+    db: Session = Depends(get_db),
+):
+    return db_user.delete_user(db, id)
