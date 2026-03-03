@@ -53,6 +53,7 @@ def get_access_token(
         "access_token": access_token,
         "refresh_token": refresh_token,
         "username": user.username,
+        "name": user.name,
         "role_name": role_name[0] if role_name else "member",
     }
 
