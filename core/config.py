@@ -32,11 +32,11 @@ class Settings:
         self.jwt_algorithm = os.getenv("JWT_ALGORITHM", "HS256")
         self.access_token_expire_minutes = _as_int(
             os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"),
-            30,
+            1,
         )
         self.refresh_token_expire_minutes = _as_int(
             os.getenv("REFRESH_TOKEN_EXPIRE_MINUTES"),
-            10080,
+            1,
         )
         self.cors_origins = self._parse_origins(
             os.getenv(
