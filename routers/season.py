@@ -4,7 +4,7 @@ from database.database import get_db
 from database import db_season
 from typing import List
 from auth.oauth2 import get_current_user
-from routers.schemas import SeasonBase, UserBase, SeasonUpdateBase
+from routers.schemas import SeasonBase, SeasonDisplay, UserBase, SeasonUpdateBase
 from constant.role import ADMIN_ROLE, ALL_ROLE
 
 router = APIRouter(prefix="/season", tags=["season"])
@@ -24,7 +24,7 @@ async def create_season(
 
 @router.get(
     "/season-list",
-    response_model=List[SeasonBase],
+    response_model=List[SeasonDisplay],
     dependencies=[Depends(ALL_ROLE)],
 )
 def get_all_seasons(
@@ -49,7 +49,7 @@ def update_season(
 
 @router.get(
     "/current-seasons",
-    response_model=List[SeasonBase],
+    response_model=List[SeasonDisplay],
     dependencies=[Depends(ALL_ROLE)],
 )
 def get_all_current_seasons(

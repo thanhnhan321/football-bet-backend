@@ -11,6 +11,17 @@ from database.db_match import delete_match
 router = APIRouter(prefix="/match", tags=["match"])
 
 
+@router.get(
+    "/match-list",
+    dependencies=[Depends(ALL_ROLE)],
+)
+def get_match_list(
+    db: Session = Depends(get_db),
+    current_user: UserBase = Depends(get_current_user),
+):
+    return db_match.get_all_matches(db)
+
+
 @router.post(
     "/create-match",
     dependencies=[Depends(ADMIN_ROLE)],

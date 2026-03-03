@@ -1,5 +1,5 @@
 from .database import Base
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import ForeignKey
 
@@ -50,7 +50,7 @@ class DbMatch(Base):
     match_result = Column(String)
     season_id = Column(Integer)
     option_id = Column(Integer)
-    AgivesB = Column("agivesb", Integer)
+    AgivesB = Column("agivesb", Float)
     status = Column(Integer)
 
 

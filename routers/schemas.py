@@ -18,7 +18,7 @@ class MatchBase(BaseModel):
     match_start: datetime
     match_bet: int
     season_id: int
-    AgivesB: int
+    AgivesB: float
 
 
 class MatchUpdateBase(BaseModel):
@@ -29,7 +29,7 @@ class MatchUpdateBase(BaseModel):
     match_result: str
     season_id: int
     option_id: int
-    AgivesB: int
+    AgivesB: float
     status: int
 
 
@@ -46,6 +46,14 @@ class SeasonBase(BaseModel):
     season_start: datetime
     season_end: datetime
     season_image: str
+
+
+class SeasonDisplay(SeasonBase):
+    id: int
+    status: int
+
+    class Config:
+        from_attributes = True
 
 
 class UserDisplay(BaseModel):
