@@ -20,7 +20,7 @@ def create_match(db: Session, request: MatchBase):
         match_result=None,
         season_id=request.season_id,
         option_id=None,
-        match_description=request.match_description,
+        AgivesB=request.AgivesB,
         status=1,
     )
 
@@ -56,7 +56,7 @@ def update_match(db: Session, id: int, request: MatchUpdateBase):
             DbMatch.match_result: request.match_result,
             DbMatch.season_id: request.season_id,
             DbMatch.option_id: request.option_id,
-            DbMatch.match_description: request.match_description,
+            DbMatch.AgivesB: request.AgivesB,
             DbMatch.status: request.status,
         }
     )

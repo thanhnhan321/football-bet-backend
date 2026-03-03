@@ -50,7 +50,7 @@ class DbMatch(Base):
     match_result = Column(String)
     season_id = Column(Integer)
     option_id = Column(Integer)
-    match_description = Column(String)
+    AgivesB = Column("agivesb", Integer)
     status = Column(Integer)
 
 

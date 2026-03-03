@@ -18,7 +18,7 @@ class MatchBase(BaseModel):
     match_start: datetime
     match_bet: int
     season_id: int
-    match_description: str
+    AgivesB: int
 
 
 class MatchUpdateBase(BaseModel):
@@ -29,7 +29,7 @@ class MatchUpdateBase(BaseModel):
     match_result: str
     season_id: int
     option_id: int
-    match_description: str
+    AgivesB: int
     status: int
 
 
