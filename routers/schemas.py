@@ -60,7 +60,6 @@ class SeasonBase(BaseModel):
 
 class SeasonDisplay(SeasonBase):
     id: int
-    status: int
 
     class Config:
         from_attributes = True
@@ -129,4 +128,3 @@ class SeasonUpdateBase(BaseModel):
     season_start: datetime
     season_end: datetime
     season_image: str
-    season_status: int

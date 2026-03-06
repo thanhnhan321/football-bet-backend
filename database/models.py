@@ -29,7 +29,6 @@ class DbSeason(Base):
     season_start = Column(DateTime)
     season_end = Column(DateTime)
     season_image = Column(String)
-    status = Column(Integer)
 
 
 class DbRole(Base):

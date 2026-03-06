@@ -12,7 +12,6 @@ def create_season(db: Session, request: SeasonBase):
         season_start=request.season_start,
         season_end=request.season_end,
         season_image=request.season_image,
-        status=1,
     )
 
     db.add(new_season)
